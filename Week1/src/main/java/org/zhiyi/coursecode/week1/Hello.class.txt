@@ -1,0 +1,75 @@
+
+1.Class文件信息
+Classfile /D:/geekbang/Geek-CourseCodes/Week1/target/classes/org/zhiyi/coursecode/week1/Hello.class
+  Last modified 2021-8-7; size 480 bytes    // 最后修改时间 和 文件大小
+  MD5 checksum 26277e8e64a300fa0b4810db3209a7d7 // MD5 校验和
+  Compiled from "Hello.java" // 源文件信息
+
+2.Class信息
+public class org.zhiyi.coursecode.week1.Hello // Class的完全限定名
+  minor version: 0 // 小版本号信息
+  major version: 52 // 大版本号信息 java8
+  flags: ACC_PUBLIC, ACC_SUPER
+
+3.常量池信息
+Constant pool:
+   #1 = Methodref          #3.#20         // java/lang/Object."<init>":()V  方法引用，即类名.方法名， ()代表无参，V代表void
+   #2 = Class              #21            // org/zhiyi/coursecode/week1/Hello  类自身信息
+   #3 = Class              #22            // java/lang/Object  Object父类信息
+   #4 = Utf8               fieldA         // 属性“fieldA” 字面量，UTF-8字符串
+   #5 = Utf8               Ljava/lang/String;       //L代表对象类型，java/lang/String为对象的类型
+   #6 = Utf8               <init>         // UTF-8字符串，<init>为item的值
+   #7 = Utf8               ()V
+   #8 = Utf8               Code
+   #9 = Utf8               LineNumberTable
+  #10 = Utf8               LocalVariableTable
+  #11 = Utf8               this
+  #12 = Utf8               Lorg/zhiyi/coursecode/week1/Hello;
+  #13 = Utf8               main
+  #14 = Utf8               ([Ljava/lang/String;)V
+  #15 = Utf8               args
+  #16 = Utf8               [Ljava/lang/String;
+  #17 = Utf8               MethodParameters
+  #18 = Utf8               SourceFile
+  #19 = Utf8               Hello.java
+  #20 = NameAndType        #6:#7          // "<init>":()V
+  #21 = Utf8               org/zhiyi/coursecode/week1/Hello
+  #22 = Utf8               java/lang/Object
+
+
+4.方法信息
+{
+  4.1 构造方法信息
+  public org.zhiyi.coursecode.week1.Hello();
+    descriptor: ()V     // 方法描述信息，() 无参， V void
+    flags: ACC_PUBLIC   // 访问权限描述符 public
+    Code:
+      stack=1, locals=1, args_size=1          // 操作数栈1，本地变量（局部变量）表数量1，方法参数1 ； 构造方法是特殊的实例方法，包含this指针所以是1
+         0: aload_0                           // 将局部变量表0号槽位中的引用类型addreass压入操作数栈，0号槽位应该存放的是自身对象的引用
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V  invokespecial调用实例初始化，父类初始化和私有方法
+         4: return                            // return 方法结束
+      LineNumberTable:                        // 源代码文件行号与字节码偏移量的对照表
+        line 3: 0                             // 源代码第三行对应字节码偏移量0位置
+      LocalVariableTable:                     // 局部变量表（本地方法表）
+        Start  Length  Slot  Name   Signature // Start 开始位置  Length 长度  Slot 变量插槽  Name 名称  Signature 类的签名，L开头代表对象类型
+            0       5     0  this   Lorg/zhiyi/coursecode/week1/Hello;
+
+  4.2 类中main方法信息
+  public static void main(java.lang.String[]);
+    descriptor: ([Ljava/lang/String;)V
+    flags: ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=0, locals=1, args_size=1
+         0: return
+      LineNumberTable:
+        line 31: 0
+      LocalVariableTable:
+        Start  Length  Slot  Name   Signature
+            0       1     0  args   [Ljava/lang/String;
+    MethodParameters:                       // main()运行期间方法参数名称 编译javac -parameters
+      Name                           Flags
+      args
+}
+
+5.源文件：Hello.java
+SourceFile: "Hello.java"

@@ -10,7 +10,7 @@ public class MyClassLoader extends ClassLoader{
     private static final int READ_SIZE = 1024; // 每次读取字节大小
 
     @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException {
+    protected Class<?> findClass(String name) {
         // 这里获取resources/Hello.xlass 输入流，不可以使用File的形式获取
         ClassPathResource resource = new ClassPathResource("Hello.xlass");
         try(InputStream inputStream = resource.getInputStream()) {
@@ -33,8 +33,8 @@ public class MyClassLoader extends ClassLoader{
     /**
      * 按字节取反
      * origin 数组扩容
-     * @param bytes
-     * @param read
+     * @param bytes 字节数组
+     * @param read 数组大小
      */
     private void decode(byte[] bytes, int read) {
         int offset = 0;

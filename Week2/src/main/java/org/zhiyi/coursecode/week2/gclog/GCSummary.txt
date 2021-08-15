@@ -1,0 +1,22 @@
+Serial GC：
+串行GC，在年轻代使用 mark-copy（标记-复制） 算法，在老年代使用mark-sweep-compact（标记-清除-整理）算法；无论新生代还是老年代的GC都以单线程收集垃圾，不能与业务线程并发处理，GC阶段将全线暂停；其单线程处理GC，不能充分利用多核CPU资源，垃圾回收效率不高，如用堆内存过大的环境中会导致GC pause时间过长，因此只适用于单核CPU，堆内存较小的运行环境。
+
+Parallel GC：
+并行GC，java6-8 默认GC，在年轻代使用 标记-复制（mark-copy）算法，在老年代使用 标记-清除-整理（mark-sweep-compact）算法；年轻代和老年代的垃圾回收都会触发 STW事件。并行垃圾收集器适用于多核服务器，在GC期间其所有CPU内核都在并行清理垃圾，所以总暂停时间更短；主要目标是增加业务处理吞吐量，但吞吐量最优不一定意味着GC暂停的时间短。
+
+CMS GC：
+并发标记清除GC，在年轻代使用标记-复制算法，在老年代使用标记-清除算法，不对老年代内存进行碎片整理，而使用空闲列表的方式来管理内存。其并发指的是GC期间，大部分工作不暂停业务线程，业务线程与GC线程并发处理，一同使用CPU资源，尽可能地降低因GC pause导致的系统延迟，因其与业务线程并发执行，会一定程度上降低业务吞吐量。 CMS GC默认启用ParNewGC对年轻代进行垃圾收集工作。
+
+G1 GC：
+Garbage-First，垃圾优先GC。java9默认GC，从长期的计划来看是用以取代CMS GC为目标，与CMS GC相比，一方面G1会压缩空闲内存使之更紧凑，使用Regions代替空闲列表进行内存分配；另一方面G1 STW时间更加可控，添加了预期机制，用户可以指定期望的停顿时间。
+与其他GC相比，G1 GC的堆内存不再划分年轻代、老年代，而是将整个堆划分成相同大小的Region，每个Region都可以被标记为Eden、Survivor、Old区，在逻辑上将Eden、Survivor组合起来就是年轻代，Old区组合起来就是老年代。
+这样划分内存后，G1 GC不必每次都去收集整个堆空间，而是以增量的形式处理，其可以预估每个Region中存活的对象数量，构建收集的原则是优先收集垃圾最多的区域。
+G1 GC的处理模式可以分为三种：
+1、Evacuation Pause (young)
+年轻代模式转移暂停，判断对象是否存活是从GC ROOTS出发，能够到达的对象就是存活的。在此阶段，老年代的对象时不回收的，因此G1引入了一个新思路，Remembered Set简称RSet，每一个Region都有自己的RSet，记录了其他Region中的对象引用本Region中对象的关系，当选定Young Gen Region作为Roots后，只需要扫描RSet，而不需要扫描整个Old Gen就可以完成Roots扫描，减少了其GC的工作量。
+2、Concurrent Marking
+与CMS并发标记过程基本一致，需要注意，全局并发标记是在堆内存总体使用比例到达一定的值后触发的。-XX:InitiatingHeapOccupancyPercent，默认45。 G1 保证其回收的对象全都是垃圾利用的是STAB（初始快照）算法。
+3、Evacuation Pause(mixed)
+混合模式转移暂停，G1进行一次混合收集，收集年轻代和老年代内存。mixed GC选定所有新生代的Region和全局并发标记统计出的若干老年代Region进行垃圾收集。
+G1 GC日志分析：
+https://www.yuque.com/docs/share/feb9f152-bb4a-44b2-b7fd-adabc2e6bae5?# 《13.G1 GC 日志分析》

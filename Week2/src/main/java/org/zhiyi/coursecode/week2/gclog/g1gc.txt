@@ -1,0 +1,170 @@
+语雀笔记连接：
+https://www.yuque.com/docs/share/feb9f152-bb4a-44b2-b7fd-adabc2e6bae5?# 《13.G1 GC 日志分析》
+
+由于 G1 GC -XX:+PrintGCDetails 信息过于复杂，日志庞大，可以使用-XX:+PrintGC 打印大致信息。
+$ java -Xms4g -Xmx4g -XX:+UseG1GC -XX:-UseAdaptiveSizePolicy -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.g1GC_01.log.3 org.zhiyi.coursecode.week2.gclog.GCLogAnalysis
+
+截取典型日志块进行分析：
+
+• Young GC 日志块
+2021-08-14T20:59:22.310+0800: 0.160: [GC pause (G1 Evacuation Pause) (young), 0.0063375 secs]    GC 发生时间， 相对JVM启动时间，GC类型， 耗时
+以下开始是并行任务日志
+   [Parallel Time: 5.3 ms, GC Workers: 6]  并行任务耗时，并行收集的 GC 线程数量 （核心数大于8时，核心数*5/8 + 3）
+      [GC Worker Start (ms): Min: 159.8, Avg: 159.9, Max: 159.9, Diff: 0.1] 最小|最大时间戳表示第一个线程和最后一个线程的启动时间。理想情况下希望同时启动。
+      [Ext Root Scanning (ms): Min: 0.1, Avg: 1.0, Max: 5.0, Diff: 4.9, Sum: 5.7]   扫描外部root 节点的时间，包括JNI、全局变量、线程栈等
+      [Update RS (ms): Min: 0.0, Avg: 0.4, Max: 0.8, Diff: 0.8, Sum: 2.7]    每个线程更新RSet的时间
+         [Processed Buffers: Min: 0, Avg: 7.3, Max: 12, Diff: 12, Sum: 44]
+      [Scan RS (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.1]  扫描每个CSet中Region的RSet时间
+      [Code Root Scanning (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0] 扫描Code Root耗时 JIT引用的堆中对象
+      [Object Copy (ms): Min: 0.0, Avg: 3.6, Max: 4.4, Diff: 4.4, Sum: 21.7]  拷贝存活对象到新Region
+      [Termination (ms): Min: 0.0, Avg: 0.1, Max: 0.1, Diff: 0.1, Sum: 0.3]  当GC线程完成任务之后尝试结束到真正结束耗时。因为在结束前他会检查其他线程是否有未完成的任务，帮助完成之后再结束。
+         [Termination Attempts: Min: 1, Avg: 1.2, Max: 2, Diff: 1, Sum: 7]
+      [GC Worker Other (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.1]
+      [GC Worker Total (ms): Min: 5.1, Avg: 5.1, Max: 5.1, Diff: 0.1, Sum: 30.6]  每个线程花费的时间总和。
+      [GC Worker End (ms): Min: 165.0, Avg: 165.0, Max: 165.0, Diff: 0.0]
+以下开始是串行任务日志
+   [Code Root Fixup: 0.0 ms] 修复GC期间code root指针改变的耗时
+   [Code Root Purge: 0.0 ms] 清除code root耗时
+   [Clear CT: 0.3 ms] 清除card tables 中的dirty card的耗时
+其他事项
+   [Other: 0.8 ms]
+      [Choose CSet: 0.0 ms]
+      [Ref Proc: 0.2 ms]
+      [Ref Enq: 0.0 ms]
+      [Redirty Cards: 0.2 ms]
+      [Humongous Register: 0.0 ms]
+      [Humongous Reclaim: 0.0 ms]
+      [Free CSet: 0.0 ms]
+各代内存变化
+   [Eden: 102.0M(102.0M)->0.0B(89.0M) Survivors: 0.0B->13.0M Heap: 131.4M(2048.0M)->49.7M(2048.0M)]
+本次 GC 耗时
+ [Times: user=0.00 sys=0.00, real=0.01 secs]
+
+
+• Young GC to-space exhausted
+2021-08-14T20:59:22.989+0800: 0.838: [GC pause (G1 Evacuation Pause) (young) (to-space exhausted), 0.0124411 secs]
+   [Parallel Time: 9.0 ms, GC Workers: 6]
+      [GC Worker Start (ms): Min: 838.3, Avg: 838.4, Max: 838.4, Diff: 0.1]
+      [Ext Root Scanning (ms): Min: 0.0, Avg: 0.1, Max: 0.2, Diff: 0.1, Sum: 0.5]
+      [Update RS (ms): Min: 0.1, Avg: 0.2, Max: 0.2, Diff: 0.1, Sum: 1.0]
+         [Processed Buffers: Min: 0, Avg: 3.2, Max: 4, Diff: 4, Sum: 19]
+      [Scan RS (ms): Min: 0.1, Avg: 0.1, Max: 0.1, Diff: 0.1, Sum: 0.7]
+      [Code Root Scanning (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
+      [Object Copy (ms): Min: 8.1, Avg: 8.2, Max: 8.2, Diff: 0.1, Sum: 49.0]
+      [Termination (ms): Min: 0.0, Avg: 0.1, Max: 0.1, Diff: 0.1, Sum: 0.4]
+         [Termination Attempts: Min: 1, Avg: 1.0, Max: 1, Diff: 0, Sum: 6]
+      [GC Worker Other (ms): Min: 0.0, Avg: 0.0, Max: 0.1, Diff: 0.1, Sum: 0.2]
+      [GC Worker Total (ms): Min: 8.5, Avg: 8.6, Max: 8.7, Diff: 0.2, Sum: 51.8]
+      [GC Worker End (ms): Min: 847.0, Avg: 847.0, Max: 847.0, Diff: 0.1]
+   [Code Root Fixup: 0.0 ms]
+   [Code Root Purge: 0.0 ms]
+   [Clear CT: 0.4 ms]
+   [Other: 3.1 ms]
+      [Evacuation Failure: 1.3 ms]  这里出现了Evacuation Failure
+什么是Evacuation Failure
+当JVM在GC期间复制对象到Survior区或或者提升对象时，堆空间被耗尽，堆区域升级失败。堆无法扩展，因为它已经处于最大值。这种情况在-XX:+PrintGCDetails将会以TO空间溢出(to-space overflow)的形式表示。代价是十分昂贵的，因为
+• GC仍然需要继续，所以必须释放空间
+• 未成功复制的对象必须在适当的位置保留
+• 对CSet中区域的RSet的任何更新都必须重新生成
+• 所有这些步骤都很昂贵。
+如何避免Evacuation Failure
+为了避免Evacuation Failure，考虑以下选项。
+• 增大堆（内存)大小
+• 增大-XX:G1ReservePercent=n，默认是10
+• G1会预留一部分内存，制造一个假天花板，当真正Evacuation Failure时还有内存可用。
+• 早点启动标记周期-XX:InitiatingHeapOccupancyPercent=n，默认值是45，0代表并发标记一直运行。
+• 增大并行标记的线程数，使用-XX:ConcGCThreads=n选项。
+      [Choose CSet: 0.0 ms]
+      [Ref Proc: 0.2 ms]
+      [Ref Enq: 0.0 ms]
+      [Redirty Cards: 0.5 ms]
+      [Humongous Register: 0.1 ms]
+      [Humongous Reclaim: 0.5 ms]
+      [Free CSet: 0.2 ms]
+   [Eden: 1211.0M(1211.0M)->0.0B(283.0M) Survivors: 17.0M->62.0M Heap: 1763.4M(2048.0M)->1001.9M(2048.0M)]
+ [Times: user=0.03 sys=0.06, real=0.01 secs]
+
+
+• Young GC G1 Humongous Allocation
+2021-08-14T20:59:23.002+0800: 0.851: [GC pause (G1 Humongous Allocation) (young) (initial-mark), 0.0074005 secs]
+   [Parallel Time: 6.4 ms, GC Workers: 6]
+      [GC Worker Start (ms): Min: 850.9, Avg: 851.0, Max: 851.1, Diff: 0.1]
+      [Ext Root Scanning (ms): Min: 0.0, Avg: 0.1, Max: 0.2, Diff: 0.1, Sum: 0.6]
+      [Update RS (ms): Min: 0.1, Avg: 0.1, Max: 0.1, Diff: 0.1, Sum: 0.6]
+         [Processed Buffers: Min: 2, Avg: 2.3, Max: 3, Diff: 1, Sum: 14]
+      [Scan RS (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
+      [Code Root Scanning (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
+      [Object Copy (ms): Min: 5.9, Avg: 6.0, Max: 6.0, Diff: 0.1, Sum: 35.8]
+      [Termination (ms): Min: 0.0, Avg: 0.0, Max: 0.1, Diff: 0.1, Sum: 0.3]
+         [Termination Attempts: Min: 1, Avg: 1.0, Max: 1, Diff: 0, Sum: 6]
+      [GC Worker Other (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
+      [GC Worker Total (ms): Min: 6.2, Avg: 6.2, Max: 6.3, Diff: 0.2, Sum: 37.4]
+      [GC Worker End (ms): Min: 857.2, Avg: 857.2, Max: 857.2, Diff: 0.0]
+   [Code Root Fixup: 0.0 ms]
+   [Code Root Purge: 0.0 ms]
+   [Clear CT: 0.4 ms]
+   [Other: 0.7 ms]
+      [Choose CSet: 0.0 ms]
+      [Ref Proc: 0.3 ms]
+      [Ref Enq: 0.0 ms]
+      [Redirty Cards: 0.0 ms]
+      [Humongous Register: 0.1 ms]
+      [Humongous Reclaim: 0.0 ms]
+      [Free CSet: 0.1 ms]
+   [Eden: 2048.0K(283.0M)->0.0B(655.0M) Survivors: 62.0M->1024.0K Heap: 1003.7M(2048.0M)->1001.1M(2048.0M)]
+ [Times: user=0.08 sys=0.02, real=0.01 secs]
+并发标记周期开始
+并发标记的5个阶段
+2021-08-14T20:59:23.009+0800: 0.858: [GC concurrent-root-region-scan-start]
+2021-08-14T20:59:23.009+0800: 0.858: [GC concurrent-root-region-scan-end, 0.0001332 secs]
+2021-08-14T20:59:23.009+0800: 0.858: [GC concurrent-mark-start]
+2021-08-14T20:59:23.013+0800: 0.862: [GC concurrent-mark-end, 0.0038977 secs]
+2021-08-14T20:59:23.013+0800: 0.863: [GC remark 2021-08-14T20:59:23.013+0800: 0.863: [Finalize Marking, 0.0003085 secs] 2021-08-14T20:59:23.014+0800: 0.863: [GC ref-proc, 0.0001415 secs] 2021-08-14T20:59:23.014+0800: 0.863: [Unloading, 0.0005213 secs], 0.0015333 secs]
+ [Times: user=0.00 sys=0.00, real=0.00 secs]
+2021-08-14T20:59:23.014+0800: 0.864: [GC cleanup 1036M->1005M(2048M), 0.0015167 secs]
+ [Times: user=0.00 sys=0.00, real=0.00 secs]
+2021-08-14T20:59:23.017+0800: 0.866: [GC concurrent-cleanup-start]
+2021-08-14T20:59:23.017+0800: 0.866: [GC concurrent-cleanup-end, 0.0000167 secs]
+
+
+• Mixed GC
+2021-08-14T20:59:23.135+0800: 0.984: [GC pause (G1 Evacuation Pause) (mixed), 0.0103728 secs]
+   [Parallel Time: 9.2 ms, GC Workers: 6]
+      [GC Worker Start (ms): Min: 984.6, Avg: 984.7, Max: 984.7, Diff: 0.1]
+      [Ext Root Scanning (ms): Min: 0.1, Avg: 0.1, Max: 0.2, Diff: 0.1, Sum: 0.7]
+      [Update RS (ms): Min: 0.2, Avg: 0.3, Max: 0.4, Diff: 0.2, Sum: 1.5]
+         [Processed Buffers: Min: 0, Avg: 4.7, Max: 6, Diff: 6, Sum: 28]
+      [Scan RS (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.2]
+      [Code Root Scanning (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
+      [Object Copy (ms): Min: 8.4, Avg: 8.6, Max: 8.7, Diff: 0.2, Sum: 51.5]
+      [Termination (ms): Min: 0.0, Avg: 0.1, Max: 0.1, Diff: 0.1, Sum: 0.5]
+         [Termination Attempts: Min: 1, Avg: 1.5, Max: 3, Diff: 2, Sum: 9]
+      [GC Worker Other (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]
+      [GC Worker Total (ms): Min: 9.0, Avg: 9.1, Max: 9.1, Diff: 0.1, Sum: 54.4]
+      [GC Worker End (ms): Min: 993.7, Avg: 993.7, Max: 993.7, Diff: 0.0]
+   [Code Root Fixup: 0.0 ms]
+   [Code Root Purge: 0.0 ms]
+   [Clear CT: 0.3 ms]
+   [Other: 0.9 ms]
+      [Choose CSet: 0.0 ms]
+      [Ref Proc: 0.1 ms]
+      [Ref Enq: 0.0 ms]
+      [Redirty Cards: 0.4 ms]
+      [Humongous Register: 0.1 ms]
+      [Humongous Reclaim: 0.1 ms]
+      [Free CSet: 0.1 ms]
+   [Eden: 20.0M(20.0M)->0.0B(97.0M) Survivors: 82.0M->5120.0K Heap: 1429.3M(2048.0M)->1298.4M(2048.0M)]
+ [Times: user=0.00 sys=0.00, real=0.01 secs]
+
+
+• 堆内存区域分配
+Heap
+ garbage-first heap   total 2097152K, used 1046575K [0x0000000080000000, 0x0000000080104000, 0x0000000100000000)
+  region size 1024K, 242 young (247808K), 14 survivors (14336K)
+ Metaspace       used 2694K, capacity 4486K, committed 4864K, reserved 1056768K
+  class space    used 288K, capacity 386K, committed 512K, reserved 1048576K
+
+
+通过GC easy GC原因统计，程序运行期间发生了2次Evacuation Failure，2次G1 Humongous Allocation
+• 当没有空间使年轻代晋升至老年代或复制到存活区时，且堆无法扩展时，就会发生转移失败。
+• 当新对象大小超过了Region Size 50%时，会发生大对象分配，大对象分配后，Region的剩余内存将不再用于分配，如果有多个这样巨大的对象，将使堆内存变得碎片化。1.8u40前，Humongous Regions 的回收只在 Full GC 中。

@@ -1,7 +1,6 @@
 package org.zhiyi.coursecode.week3.gateway.outbound.netty4;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
@@ -16,8 +15,6 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestEncoder;
 import io.netty.handler.codec.http.HttpResponseDecoder;
 import io.netty.handler.codec.http.HttpVersion;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 负责调用业务API
@@ -25,19 +22,11 @@ import java.util.Map;
  */
 public class NettyHttpClient {
 
-    private Map<String, Channel> channelCache = new HashMap<>();
 
     public void connect(String ip, int port, String uri, ChannelHandlerContext ctx) {
+
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
-            if (channelCache.containsKey(ip+port)) {
-                Channel f = channelCache.get(ip + port);
-                DefaultFullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, uri);
-                f.write(request);
-                f.flush();
-                f.closeFuture().sync();
-                return;
-            }
             //1.用户线程创建Bootstrap
             //Bootstrap是Socket客户端创建工具类，通过API设置创建客户端相关的参数，异步发起客户端连接。
             Bootstrap b = new Bootstrap();
@@ -49,7 +38,7 @@ public class NettyHttpClient {
             //4.创建默认的channel Handler pipeline，用于调度和执行网络事件。
             b.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
-                public void initChannel(SocketChannel ch) throws Exception {
+                public void initChannel(SocketChannel ch) {
                     // 客户端接收到的是httpResponse响应，所以要使用HttpResponseDecoder进行解码
                     ch.pipeline().addLast(new HttpResponseDecoder());
 //                     客户端发送的是httprequest，所以要使用HttpRequestEncoder进行编码
@@ -65,7 +54,7 @@ public class NettyHttpClient {
             f.channel().write(request);
             f.channel().flush();
             f.channel().closeFuture().sync();
-            channelCache.put(ip + port, f.channel());
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {

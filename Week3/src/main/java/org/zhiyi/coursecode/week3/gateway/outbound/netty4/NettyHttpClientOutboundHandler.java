@@ -20,12 +20,12 @@ public class NettyHttpClientOutboundHandler extends ChannelInboundHandlerAdapter
     }
 
     @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+    public void channelReadComplete(ChannelHandlerContext ctx) {
         System.out.println("readComplete.. begin response handle");
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(ChannelHandlerContext ctx) {
 
     }
 
@@ -46,6 +46,7 @@ public class NettyHttpClientOutboundHandler extends ChannelInboundHandlerAdapter
             response = new DefaultFullHttpResponse(HTTP_1_1, NO_CONTENT);
             exceptionCaught(ctx, e);
         } finally {
+            buf.release();
             //response.headers().set(CONNECTION, KEEP_ALIVE);
             ctx.write(response);
             ctx.flush();

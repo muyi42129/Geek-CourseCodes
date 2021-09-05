@@ -18,8 +18,7 @@ import org.zhiyi.starter.learn.sources.Student;
 
 @SpringBootApplication
 @ImportResource(locations = "applicationContext.xml")
-//@EnableConfigurationProperties
-@ComponentScan("org.zhiyi.*")
+//@ComponentScan("org.zhiyi.*")
 public class Week5Application {
 
     public static void main(String[] args) {
@@ -61,10 +60,11 @@ public class Week5Application {
         /*
          * Starter 作业
          * 通过 application.properties 统一前缀配置对Bean进行装配
+         * 注意 starter 中 spring.factories 命名，一定要放在META-INF/ 下，具体原因是 @SpringBootApplication
+         * SpringFactoriesLoader.loadFactoryNames方法调用loadSpringFactories方法从所有的jar包中读取META-INF/spring.factories文件信息
          *
          * 2021-09-05
          */
-        //TODO 目前使用这个Starter 需要声明 @ComponentScan("org.zhiyi.*") 否则无法扫描到starter中的Bean 这里可能需要有其他的办法
         Student student = (Student) applicationContext.getBean("student");
         System.out.println(student);
 
@@ -73,8 +73,6 @@ public class Week5Application {
 
         School school = (School) applicationContext.getBean("school");
         System.out.println(school);
-
-
 
     }
 

@@ -1,10 +1,9 @@
 package org.zhiyi.starter.learn.starter;
 
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.zhiyi.starter.learn.sources.Klass;
 import org.zhiyi.starter.learn.sources.School;
 import org.zhiyi.starter.learn.sources.Student;
@@ -19,7 +18,7 @@ import javax.annotation.Resource;
 @Configuration
 // 绑定配置文件
 @EnableConfigurationProperties({KlassProperties.class, SchoolProperties.class, StudentProperties.class}) // 绑定配置文件
-public class LearnStarterAutoConfiguration implements EnvironmentAware {
+public class LearnStarterAutoConfiguration {
 
     @Resource
     StudentProperties studentProperties;
@@ -58,8 +57,4 @@ public class LearnStarterAutoConfiguration implements EnvironmentAware {
         return school;
     }
 
-    @Override
-    public void setEnvironment(Environment environment) {
-
-    }
 }

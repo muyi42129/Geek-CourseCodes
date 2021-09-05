@@ -1,0 +1,62 @@
+{
+  "groups": [
+    {
+      "name": "zhiyi.klass",
+      "type": "org.zhiyi.starter.learn.starter.prop.KlassProperties",
+      "sourceType": "org.zhiyi.starter.learn.starter.prop.KlassProperties"
+    },
+    {
+      "name": "zhiyi.school",
+      "type": "org.zhiyi.starter.learn.starter.prop.SchoolProperties",
+      "sourceType": "org.zhiyi.starter.learn.starter.prop.SchoolProperties"
+    },
+    {
+      "name": "zhiyi.student",
+      "type": "org.zhiyi.starter.learn.starter.prop.StudentProperties",
+      "sourceType": "org.zhiyi.starter.learn.starter.prop.StudentProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "zhiyi.klass.name",
+      "type": "java.lang.String",
+      "sourceType": "org.zhiyi.starter.learn.starter.prop.KlassProperties"
+    },
+    {
+      "name": "zhiyi.klass.school-id",
+      "type": "java.lang.String",
+      "sourceType": "org.zhiyi.starter.learn.starter.prop.KlassProperties"
+    },
+    {
+      "name": "zhiyi.school.id",
+      "type": "java.lang.String",
+      "sourceType": "org.zhiyi.starter.learn.starter.prop.SchoolProperties"
+    },
+    {
+      "name": "zhiyi.school.name",
+      "type": "java.lang.String",
+      "sourceType": "org.zhiyi.starter.learn.starter.prop.SchoolProperties"
+    },
+    {
+      "name": "zhiyi.student.id",
+      "type": "java.lang.String",
+      "sourceType": "org.zhiyi.starter.learn.starter.prop.StudentProperties"
+    },
+    {
+      "name": "zhiyi.student.klass-id",
+      "type": "java.lang.String",
+      "sourceType": "org.zhiyi.starter.learn.starter.prop.StudentProperties"
+    },
+    {
+      "name": "zhiyi.student.name",
+      "type": "java.lang.String",
+      "sourceType": "org.zhiyi.starter.learn.starter.prop.StudentProperties"
+    },
+    {
+      "name": "zhiyi.student.school-id",
+      "type": "java.lang.String",
+      "sourceType": "org.zhiyi.starter.learn.starter.prop.StudentProperties"
+    }
+  ],
+  "hints": []
+}

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="bean1" class="org.zhiyi.coursecode.week5.beans.WiredBean1" primary="true">
+        <property name="beanName" value="bean1.beanName" />
+    </bean>
+
+    <bean id="bean1_1" class="org.zhiyi.coursecode.week5.beans.WiredBean1">
+        <property name="beanName" value="bean1.beanName_1" />
+    </bean>
+
+</beans>

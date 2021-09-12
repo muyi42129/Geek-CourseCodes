@@ -17,3 +17,6 @@ https://github.com/muyi42129/Geek-CourseCodes/blob/main/Week4/README.md
 
 ### Week05
 https://github.com/muyi42129/Geek-CourseCodes/tree/main/Week5/README.md
+
+### Week06
+https://github.com/muyi42129/Geek-CourseCodes/tree/main/Week6/README.md
